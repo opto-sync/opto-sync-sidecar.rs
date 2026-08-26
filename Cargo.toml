@@ -1,0 +1,21 @@
+    [package]
+    name = "opto-sync-sidecar"
+    version = "0.1.0"
+    edition = "2021"
+    license = "MIT"
+    description = "Sidecar for Opto Sync"
+    repository = "https://github.com/opto-sync/opto-sync-sidecar.rs"
+
+    [[bin]]
+    name = "opto-sync-sidecar"
+    path = "src/main.rs"
+
+    [dependencies]
+    serde = { version = "1", features = ["derive"] }
+    serde_json = "1"
+    thiserror = "2"
+
+[lints.rust]
+unsafe_code = "forbid"
+
+
