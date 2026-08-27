@@ -1,4 +1,28 @@
-name = "opto-sync-sidecar.rs"
-kind = "sidecar"
+[package]
+org = "opto-sync"
+name = "opto-sync-sidecar"
 version = "0.1.0"
+description = "Sidecar for Opto Sync."
+license = "MIT"
+keywords = ["sidecar", "observability", "k8s"]
+language = "rust"
 
+[package.repository]
+vcs = "git"
+url = "https://github.com/opto-sync/opto-sync-sidecar.rs"
+
+[dependencies]
+"ores-otel/ores-otel-sidecar" = "^0.1.0"
+
+[build]
+command = "cargo build --release --locked --bin opto-sync-sidecar"
+outputs = ["target/release/opto-sync-sidecar"]
+
+[bin]
+opto-sync-sidecar = "target/release/opto-sync-sidecar"
+
+[install]
+adapter = "none"
+
+[scripts]
+test = "cargo test --all-targets --locked"
