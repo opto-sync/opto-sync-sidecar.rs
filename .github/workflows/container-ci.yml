@@ -1,0 +1,57 @@
+name: Container CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Rust, manifest, and container
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4 # stable
+        with:
+          toolchain: 1.90.0
+          components: clippy
+
+      - name: Cache Cargo artifacts
+        uses: Swatinem/rust-cache@e18b497796c12c097a38f9edb9d0641fb99eee32 # v2
+
+      - name: Lint with generated-code exception
+        run: >-
+          cargo clippy --locked --all-targets --all-features --
+          -D warnings
+          -A clippy::match-like-matches-macro
+
+      - name: Test
+        run: cargo test --locked --all-targets --all-features
+
+      - name: Validate sidecar manifest invariants
+        run: |
+          ruby -e 'require "yaml"; value=YAML.safe_load(File.read("k8s/container.yaml")); abort("expected one container") unless value.is_a?(Array) && value.length == 1; c=value.fetch(0); abort("missing liveness") unless c.key?("livenessProbe"); abort("unexpected readiness") if c.key?("readinessProbe"); abort("not loopback") unless c.fetch("env").any? { |e| e["name"] == "OPTO_SYNC_SIDECAR_BIND" && e["value"] == "127.0.0.1:9090" }'
+
+      - name: Build container
+        env:
+          DOCKER_BUILDKIT: "1"
+        run: docker build --tag opto-sync-sidecar:pr .
+
+      - name: Inspect distroless runtime contract
+        run: |
+          test "$(docker image inspect --format '{{.Config.User}}' opto-sync-sidecar:pr)" = "65532:65532"
+          test "$(docker image inspect --format '{{join .Config.Entrypoint " "}}' opto-sync-sidecar:pr)" = "/opto-sync-sidecar"
