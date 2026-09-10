@@ -1,0 +1,24 @@
+name: DEN-390 lockfile evidence
+
+on:
+  push:
+    branches: [DEN-390-adopt-ores-sidecar-config]
+
+permissions:
+  contents: read
+
+jobs:
+  lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@1.90.0
+      - name: Generate deterministic dependency graph
+        run: cargo generate-lockfile
+      - name: Emit lockfile evidence
+        run: |
+          echo '__DEN390_CARGO_LOCK_BEGIN__'
+          cat Cargo.lock
+          echo '__DEN390_CARGO_LOCK_END__'
