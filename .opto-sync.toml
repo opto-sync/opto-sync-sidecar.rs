@@ -1,0 +1,26 @@
+version = 1
+mode = "server"
+strict = true
+
+[flags2env]
+contract = ".cli-flags.toml"
+require_audit = true
+precedence = "argv-over-env"
+
+[sync]
+push_interval_ms = 5000
+pull_interval_ms = 5000
+max_batch_size = 128
+conflict_policy = "last-write-wins"
+
+[[env]]
+name = "bind_addr"
+key = "OPTO_SYNC_SIDECAR_BIND"
+kind = "string"
+required = false
+secret = false
+default = "127.0.0.1:9090"
+
+[server]
+enabled = true
+bind_addr_binding = "bind_addr"
