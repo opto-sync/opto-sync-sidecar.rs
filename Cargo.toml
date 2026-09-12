@@ -12,8 +12,7 @@ name = "opto-sync-sidecar"
 path = "src/main.rs"
 
 [dependencies]
-ores-otel-sidecar = { git = "https://github.com/ores-otel/ores-otel-sidecar.rs", rev = "fed785ad9a638e24d458e0f2acd390624e4e748d" }
-
+ores-otel-sidecar = { git = "https://github.com/ores-otel/ores-otel-sidecar.rs", rev = "357cca21dfe6878c1855c04d60ea57353284b509" }
 
 [lints.rust]
 unsafe_code = "forbid"

@@ -1,0 +1,14 @@
+schema = "ores.sidecar/config/v1"
+
+[[sidecars]]
+id = "opto-sync-sidecar"
+path = "."
+startup_config = ".cli-flags.toml"
+runtime_mutable = []
+
+[sidecars.runtime_updates]
+provider = "disabled"
+mode = "disabled"
+poll_seconds = 180
+namespace = "opto-sync-sidecar"
+cache = "runtime-env"
